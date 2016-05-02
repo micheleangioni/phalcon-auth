@@ -1,0 +1,26 @@
+{
+    "name": "michele-angioni/phalcon-auth",
+    "description": "A library which provide you with simple authentication.",
+    "keywords": ["phalcon", "repo", "repositories"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michele Angioni",
+            "email": "michele.angioni@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5",
+        "ext-phalcon": ">=2.0.0"
+    },
+    "require-dev": {
+        "phalcon/incubator": "dev-master",
+        "phpunit/phpunit": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "MicheleAngioni\\PhalconAuth\\": "src/PhalconAuth"
+        }
+    },
+    "minimum-stability": "dev"
+}
