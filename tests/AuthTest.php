@@ -102,6 +102,21 @@ class AuthWebTest extends TestCase
         $auth->register($email, $password2);
     }
 
+    /**
+     * @expectedException \UnexpectedValueException
+     */
+    public function testRegisterFailingTextNotUnique()
+    {
+        $email = 'email@email.com';
+        $password = 'password';
+        $text = 'text';
+
+        $users = new Users();
+
+        $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
+        $auth->register($email, $password, [], ['text' => $text]);
+        $auth->register($email, $password, [], ['text' => $text]);
+    }
 }
 
 class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Contracts\RememberableAuthableInterface
