@@ -112,11 +112,36 @@ abstract class TestCase extends PhalconTestCase
                         ]
                     ),
                     new Column(
+                        'confirmation_code',
+                        [
+                            'type' => Column::TYPE_VARCHAR,
+                            'notNull' => true,
+                            'size' => 60,
+                            'after' => 'password'
+                        ]
+                    ),
+                    new Column(
+                        'confirmed',
+                        [
+                            'type' => Column::TYPE_INTEGER,
+                            'size' => 1,
+                            'after' => 'confirmation_code'
+                        ]
+                    ),
+                    new Column(
                         'token',
                         [
                             'type' => Column::TYPE_VARCHAR,
                             'size' => 20,
-                            'after' => 'email'
+                            'after' => 'confirmed'
+                        ]
+                    ),
+                    new Column(
+                        'text',
+                        [
+                            'type' => Column::TYPE_VARCHAR,
+                            'size' => 30,
+                            'after' => 'token'
                         ]
                     )
                 ],

@@ -57,7 +57,7 @@ class Auth extends Component
 
         $credentials = [
             'email' => $email,
-            'password' => $this->security->hash($password),
+            'password' => $this->security->hash($password)
         ];
 
         if ($addConfirmationCode) {

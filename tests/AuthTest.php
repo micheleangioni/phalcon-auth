@@ -35,7 +35,6 @@ class AuthWebTest extends TestCase
         $users = new Users();
 
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
-
         $auth->attemptLogin($user->email, 'password');
 
         // Check if auth session data has been saved
@@ -45,11 +44,73 @@ class AuthWebTest extends TestCase
         $this->assertArrayHasKey('id', $auth);
         $this->assertArrayHasKey('email', $auth);
     }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testAttemptLoginFailing()
+    {
+        $di = $this->getDI();
+        $security = $di->get('security');
+
+        $user = static::$fm->create('MicheleAngioni\PhalconAuth\Tests\Users');
+        $user->password = $security->hash('password');
+        $user->save();
+
+        $users = new Users();
+
+        $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
+        $auth->attemptLogin($user->email, 'wrong_password');
+    }
+
+    public function testRegister()
+    {
+        $di = $this->getDI();
+        $security = $di->get('security');
+
+        $email = 'email@email.com';
+        $password = 'password';
+        $text = 'text';
+
+        $users = new Users();
+
+        $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
+        $auth->register($email, $password, ['text' => $text]);
+
+        $user = $users->findFirst();
+
+        $this->assertEquals(1, $user->getId());
+        $this->assertEquals('email@email.com', $user->getEmail());
+        $this->assertTrue($security->checkHash('password', $user->getPassword()));
+        $this->assertEquals($text, $user->getText());
+        $this->assertNotNull($user->getConfirmationCode());
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     */
+    public function testRegisterFailingEmailNotUnique()
+    {
+        $email = 'email@email.com';
+        $password = 'password';
+        $password2 = 'password2';
+
+        $users = new Users();
+
+        $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
+        $auth->register($email, $password);
+        $auth->register($email, $password2);
+    }
+
 }
 
 class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Contracts\RememberableAuthableInterface
 {
     protected $id;
+
+    protected $confirmation_code;
+
+    protected $confirmed;
 
     protected $email;
 
@@ -57,9 +118,21 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
 
     protected $rememberToken;
 
+    protected $text;
+
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getConfirmationCode()
+    {
+        return $this->confirmation_code;
+    }
+
+    public function isConfirmed()
+    {
+        return (bool)$this->isConfirmed();
     }
 
     public function getEmail()
@@ -81,5 +154,10 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
     {
         $this->rememberToken = $token;
         $this->save();
+    }
+
+    public function getText()
+    {
+        return $this->text;
     }
 }
