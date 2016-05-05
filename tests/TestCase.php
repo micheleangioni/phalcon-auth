@@ -94,7 +94,7 @@ abstract class TestCase extends PhalconTestCase
                         ]
                     ),
                     new Column(
-                        'username',
+                        'email',
                         [
                             'type' => Column::TYPE_VARCHAR,
                             'notNull' => true,
@@ -103,17 +103,26 @@ abstract class TestCase extends PhalconTestCase
                         ]
                     ),
                     new Column(
-                        'text',
+                        'password',
+                        [
+                            'type' => Column::TYPE_VARCHAR,
+                            'notNull' => true,
+                            'size' => 60,
+                            'after' => 'email'
+                        ]
+                    ),
+                    new Column(
+                        'token',
                         [
                             'type' => Column::TYPE_VARCHAR,
                             'size' => 20,
-                            'after' => 'username'
+                            'after' => 'email'
                         ]
                     )
                 ],
                 'indexes' => [
                     new Index('PRIMARY', ['id'], 'PRIMARY'),
-                    new Index('username_UNIQUE', ['username'], 'UNIQUE')
+                    new Index('username_UNIQUE', ['email'], 'UNIQUE')
                 ],
                 'options' => [
                     'TABLE_TYPE' => 'BASE TABLE',
