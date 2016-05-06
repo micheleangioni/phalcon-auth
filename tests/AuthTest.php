@@ -161,9 +161,21 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
         return $this->email;
     }
 
+    public function setEmail($email)
+    {
+        $this->email = $email;
+        return true;
+    }
+
     public function getPassword()
     {
         return $this->password;
+    }
+
+    public function setPassword($password)
+    {
+        $this->password = $password;
+        return true;
     }
 
     public function getRememberToken()

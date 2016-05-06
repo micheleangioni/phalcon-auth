@@ -170,7 +170,7 @@ class Auth extends Component
 
         if (!$entity->setRememberToken($token)) {
             $entity->save();
-            
+
             // TODO Set Remember me time customizable in app config file
             $expire = time() + 86400 * 8;
             $this->cookies->set('RMU', $entity->getId(), $expire);
