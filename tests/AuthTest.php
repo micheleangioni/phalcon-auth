@@ -131,7 +131,7 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
 
     protected $password;
 
-    protected $rememberToken;
+    protected $remember_token;
 
     protected $text;
 
@@ -147,7 +147,7 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
 
     public function isConfirmed()
     {
-        return (bool)$this->isConfirmed();
+        return (bool)$this->confirmed;
     }
 
     public function getEmail()
@@ -162,12 +162,12 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
 
     public function getRememberToken()
     {
-        return $this->rememberToken;
+        return $this->remember_token;
     }
 
     public function setRememberToken($token)
     {
-        $this->rememberToken = $token;
+        $this->remember_token = $token;
         $this->save();
     }
 

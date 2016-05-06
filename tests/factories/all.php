@@ -9,5 +9,5 @@ $fm->define('MicheleAngioni\PhalconAuth\Tests\Users')->setDefinitions([
     //'confirmed'          => Faker::boolean(),
     'email'    => Faker::email(),
     'password' => Faker::password(),
-    'rememberToken' => Faker::regexify('[A-Z0-9._%+-]{20,40}')
+    'remember_token' => Faker::regexify('[A-Z0-9._%+-]{20,40}')
 ]);

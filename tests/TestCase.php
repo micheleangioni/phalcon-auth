@@ -129,7 +129,7 @@ abstract class TestCase extends PhalconTestCase
                         ]
                     ),
                     new Column(
-                        'token',
+                        'remember_token',
                         [
                             'type' => Column::TYPE_VARCHAR,
                             'size' => 20,
@@ -141,7 +141,7 @@ abstract class TestCase extends PhalconTestCase
                         [
                             'type' => Column::TYPE_VARCHAR,
                             'size' => 30,
-                            'after' => 'token'
+                            'after' => 'remember_token'
                         ]
                     )
                 ],
