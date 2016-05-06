@@ -169,6 +169,8 @@ class Auth extends Component
         $token = md5($entity->getEmail() . $entity->getPassword() . $userAgent);
 
         if (!$entity->setRememberToken($token)) {
+            $entity->save();
+            
             // TODO Set Remember me time customizable in app config file
             $expire = time() + 86400 * 8;
             $this->cookies->set('RMU', $entity->getId(), $expire);

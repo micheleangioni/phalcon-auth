@@ -145,6 +145,12 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
         return $this->confirmation_code;
     }
 
+    public function setConfirmationCode($confirmationCode)
+    {
+        $this->confirmation_code = $confirmationCode;
+        return true;
+    }
+
     public function isConfirmed()
     {
         return (bool)$this->confirmed;
@@ -168,7 +174,7 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
     public function setRememberToken($token)
     {
         $this->remember_token = $token;
-        $this->save();
+        return true;
     }
 
     public function getText()
