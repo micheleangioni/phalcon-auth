@@ -11,11 +11,12 @@ You are a Phalcon user, so speed and simplicity is what you are looking for.
 So, Phalcon Auth just requires your own User model to satisfy some requirements by implementing its interface. 
 Basically, it just need a few property getters: 
 
-- id 
-- email
-- password
-- confirmation_code
-- confirmed
+- getId() 
+- getEmail()
+- getPassword()
+- getConfirmationCode()
+- isConfirmed()
+- isBanned()
 
 Futhermore, if you want to use the "remember me" feature, the remember_token getter and setter are required. 
 
@@ -37,6 +38,8 @@ An example can be the this one:
     class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Contracts\RememberableAuthableInterface
     {
         protected $id;
+        
+        protected $banned;
     
         protected $confirmation_code;
     
@@ -94,6 +97,11 @@ An example can be the this one:
         {
             $this->remember_token = $token;
             return true;
+        }
+        
+        public function isBanned()
+        {
+            return (bool)$this->banned;
         }
     }
 
@@ -158,7 +166,11 @@ Now we can define a simple controller for User registration and login
                 try {
                     $user = $auth->attemptLogin($email, $password);
                 } catch (\Exception $e) {
-                    // Handle wrong credentials exception
+                    if ($e instanceof \MicheleAngioni\PhalconAuth\Exceptions\UserBannedException) {
+                        // The user is banned. Handle exception
+                    } else {
+                        // Handle wrong credentials exception
+                    }
                 }
         
                 [...]
