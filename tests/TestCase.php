@@ -129,6 +129,14 @@ abstract class TestCase extends PhalconTestCase
                         ]
                     ),
                     new Column(
+                        'banned',
+                        [
+                            'type' => Column::TYPE_INTEGER,
+                            'size' => 1,
+                            'after' => 'confirmed'
+                        ]
+                    ),
+                    new Column(
                         'remember_token',
                         [
                             'type' => Column::TYPE_VARCHAR,

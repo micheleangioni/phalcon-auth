@@ -48,7 +48,7 @@ class AuthWebTest extends TestCase
     /**
      * @expectedException \Exception
      */
-    public function testAttemptLoginFailing()
+    public function testAttemptLoginFailingWrongPassword()
     {
         $di = $this->getDI();
         $security = $di->get('security');
@@ -61,6 +61,33 @@ class AuthWebTest extends TestCase
 
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
         $auth->attemptLogin($user->email, 'wrong_password');
+    }
+
+    /**
+     * @expectedException \MicheleAngioni\PhalconAuth\Exceptions\UserBannedException
+     */
+    public function testAttemptLoginFailingBanned()
+    {
+        $di = $this->getDI();
+        $security = $di->get('security');
+        $session = $di->get('session');
+
+        $user = static::$fm->create('MicheleAngioni\PhalconAuth\Tests\Users');
+        $user->password = $security->hash('password');
+        $user->banned = true;
+        $user->save();
+
+        $users = new Users();
+
+        $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
+        $auth->attemptLogin($user->email, 'password');
+
+        // Check if auth session data has been saved
+        $auth = $session->get('auth');
+
+        $this->assertTrue(is_array($auth));
+        $this->assertArrayHasKey('id', $auth);
+        $this->assertArrayHasKey('email', $auth);
     }
 
     public function testRegister()
@@ -122,6 +149,8 @@ class AuthWebTest extends TestCase
 class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Contracts\RememberableAuthableInterface
 {
     protected $id;
+
+    protected $banned;
 
     protected $confirmation_code;
 
@@ -187,6 +216,21 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
     {
         $this->remember_token = $token;
         return true;
+    }
+
+    public function getBanned()
+    {
+        return $this->banned;
+    }
+
+    public function setBanned($banned)
+    {
+        $this->banned = $banned;
+    }
+
+    public function isBanned()
+    {
+        return (bool)$this->banned;
     }
 
     public function getText()

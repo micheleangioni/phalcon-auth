@@ -39,4 +39,11 @@ interface AuthableInterface extends \Phalcon\Mvc\ModelInterface
      */
     public function isConfirmed();
 
+    /**
+     * Must check if the model is banned or not.
+     *
+     * @return bool
+     */
+    public function isBanned();
+
 }

@@ -6,6 +6,7 @@ use MicheleAngioni\PhalconAuth\Contracts\AuthableInterface;
 use MicheleAngioni\PhalconAuth\Contracts\RememberableAuthableInterface;
 use Phalcon\Mvc\User\Component;
 use Exception;
+use MicheleAngioni\PhalconAuth\Exceptions\UserBannedException;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -96,7 +97,7 @@ class Auth extends Component
      */
     public function attemptLogin($email, $password, $saveSession = true, $rememberMe = false)
     {
-        // Check if the user exist
+        // Check if the entity exist
         $entity = $this->authable->findFirstByEmail($email);
 
         if ($entity === false) {
@@ -110,14 +111,13 @@ class Auth extends Component
             throw new Exception('Wrong email/password combination');
         }
 
-        // TODO Check if the user is banned
-        /*
-        if ($user->isBanned()) {
-            throw new UserBannedException('The User is banned');
-        }
-        */
+        // Check if the entity is banned
 
-        // If required, save the User data into the session
+        if ($entity->isBanned()) {
+            throw new UserBannedException('The entity is banned');
+        }
+
+        // If required, save the entity data into the session
 
         if ($saveSession) {
             $this->saveSessionData($entity);
@@ -215,12 +215,11 @@ class Auth extends Component
                 // TODO Check if Expiration check if correct
                 if (data('Y-m-d H:i:s',(time() - (86400 * 8))) < $cookieToken->getExpiration()) {
 
-                    // TODO Check if the Entity is banned
-                    /*
+                    // Check if the entity is banned
+
                     if ($entity->isBanned()) {
-                        throw new Exception('The user is banned');
+                        throw new UserBannedException('The entity is banned');
                     }
-                    */
 
                     // Save the User data into the session
                     $this->saveSessionData($entity);
@@ -282,21 +281,20 @@ class Auth extends Component
      */
     public function authById($id)
     {
-        $user = $this->authable->findFirstById($id);
+        $entity = $this->authable->findFirstById($id);
 
-        if ($user == false) {
+        if ($entity == false) {
             throw new Exception('The user does not exist');
         }
 
-        // TODO Check if the User is banned
-        /*
-        if ($user->isBanned()) {
-            throw new Exception('The user is banned');
+        // Check if the entity is banned
+
+        if ($entity->isBanned()) {
+            throw new UserBannedException('The entity is banned');
         }
-        */
 
         // Save the User data into the session
-        $this->saveSessionData($user);
+        $this->saveSessionData($entity);
     }
 
     /**
@@ -308,13 +306,13 @@ class Auth extends Component
      */
     public function retrieveAuthableById($id)
     {
-        $user = $this->authable->findFirstById($id);
+        $entity = $this->authable->findFirstById($id);
 
-        if ($user == false) {
+        if ($entity == false) {
             return null;
         }
 
-        return $user;
+        return $entity;
     }
 
     /**
