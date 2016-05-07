@@ -18,7 +18,10 @@ Basically, it just need a few property getters:
 - isConfirmed()
 - isBanned()
 
-Futhermore, if you want to use the "remember me" feature, the remember_token getter and setter are required. 
+Furthermore, if you want to use the "remember me" feature, the following remember token getter and setter are required
+ 
+ - getRememberToken() 
+ - setRememberToken($token)
 
 You can then use Phalcon Auth as provided out of the box or customize its behaviour. Just see below.
 
@@ -221,13 +224,28 @@ After authenticating with a "remember me", just use the following method
 ### Manually login through user id
 
     $auth->authById($id);
+
+### Customize the behaviour
+    
+When defining the Auth service, you can can pass an options array. Below all available options are listed
+
+        /**
+         * Authentication
+         */
+         $options = [
+            'rememberMeDuration' => 1096000 // Optional, default: 604800 
+         ];
+         
+        $di->set('auth', function () {
+            return \MicheleAngioni\PhalconAuthAuth(new \MyApp\Users(), $options);
+        });
     
 ## Contribution guidelines
 
-Phalcon Repositories follows PSR-1, PSR-2 and PSR-4 PHP coding standards, and semantic versioning.
+Phalcon Auth follows PSR-1, PSR-2 and PSR-4 PHP coding standards, and semantic versioning.
 
 Pull requests are welcome.
 
 ## License
 
-Phalcon Repositories is free software distributed under the terms of the MIT license.
+Phalcon Auth is free software distributed under the terms of the MIT license.
