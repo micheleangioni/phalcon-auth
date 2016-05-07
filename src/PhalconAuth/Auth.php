@@ -7,6 +7,7 @@ use MicheleAngioni\PhalconAuth\Contracts\RememberableAuthableInterface;
 use Phalcon\Mvc\User\Component;
 use Exception;
 use MicheleAngioni\PhalconAuth\Exceptions\EntityBannedException;
+use MicheleAngioni\PhalconAuth\Exceptions\EntityNotFoundException;
 use MicheleAngioni\PhalconAuth\Exceptions\RememberMeTokenExpired;
 use MicheleAngioni\PhalconAuth\Exceptions\WrongCredentialsException;
 use InvalidArgumentException;
@@ -221,8 +222,8 @@ class Auth extends Component
      * Log in using the information in the cookies.
      *
      * @throws EntityBannedException
+     * @throws EntityNotFoundException
      * @throws RememberMeTokenExpired
-     * @throws UnexpectedValueException
      *
      * @return AuthableInterface
      */
@@ -233,7 +234,7 @@ class Auth extends Component
             // Clean the environment
             $this->remove();
 
-            throw new UnexpectedValueException('Remember me were not set.');
+            throw new UnexpectedValueException('Remember me was not set.');
         }
 
         // Retrieve the remember me data
@@ -275,7 +276,7 @@ class Auth extends Component
         // Clean the environment since something went wrong
         $this->remove();
 
-        throw new UnexpectedValueException('Authable entity not found');
+        throw new EntityNotFoundException('Authable entity not found');
     }
 
     /**
@@ -330,15 +331,15 @@ class Auth extends Component
      * Auth the authable model by id.
      *
      * @param  int  $id
-     * @throws Exception
      * @throws EntityBannedException
+     * @throws EntityNotFoundException
      */
     public function authById($id)
     {
         $entity = $this->authable->findFirstById($id);
 
         if ($entity == false) {
-            throw new Exception('The user does not exist');
+            throw new EntityNotFoundException('The entity does not exist');
         }
 
         // Check if the entity is banned
@@ -372,7 +373,7 @@ class Auth extends Component
      * Get the stored authenticated entity.
      * Return false if no authentication has been made.
      *
-     * @throws Exception
+     * @throws EntityNotFoundException
      * @return AuthableInterface|bool
      */
     public function getAuth()
@@ -381,7 +382,7 @@ class Auth extends Component
 
         if (isset($identity['id'])) {
             if (!$user = $this->retrieveAuthableById($identity['id'])) {
-                throw new Exception('The authenticated model does not exist');
+                throw new EntityNotFoundException('The authenticated model does not exist');
             }
 
             return $user;
