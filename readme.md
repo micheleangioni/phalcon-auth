@@ -114,7 +114,7 @@ This way, it will be easily retrievable for example in the controllers
     /**
      * Authentication
      */
-    $di->set('auth', function () {
+    $di->setShared('auth', function () {
         return \MicheleAngioni\PhalconAuthAuth(new \MyApp\Users());
     });
 
