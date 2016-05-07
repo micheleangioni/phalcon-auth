@@ -7,6 +7,7 @@ use MicheleAngioni\PhalconAuth\Contracts\RememberableAuthableInterface;
 use Phalcon\Mvc\User\Component;
 use Exception;
 use MicheleAngioni\PhalconAuth\Exceptions\EntityBannedException;
+use MicheleAngioni\PhalconAuth\Exceptions\RememberMeTokenExpired;
 use InvalidArgumentException;
 use RuntimeException;
 use UnexpectedValueException;
@@ -182,7 +183,7 @@ class Auth extends Component
     }
 
     /**
-     * Creates the remember me environment settings the related cookies and generating the token.
+     * Creates the remember me environment settings, i.e. the related cookies and generating the token.
      *
      * @param  RememberableAuthableInterface  $entity
      */
@@ -194,20 +195,20 @@ class Auth extends Component
         if (!$entity->setRememberToken($token)) {
             $entity->save();
 
-            $expire = time() + $this->getRememberMeDuration(); // 1w;
+            $expire = time() + $this->getRememberMeDuration();
             $this->cookies->set('RMU', $entity->getId(), $expire);
             $this->cookies->set('RMT', $token, $expire);
         }
     }
 
     /**
-     * Check if the session has a remember me cookie
+     * Check if the session has a remember me environemnt set.
      *
      * @return boolean
      */
     public function hasRememberMe()
     {
-        return $this->cookies->has('RMU');
+        return $this->cookies->has('RMU') && $this->cookies->has('RMT');
     }
 
     /**
@@ -218,11 +219,23 @@ class Auth extends Component
      */
     public function loginWithRememberMe()
     {
-        //TODO Check if a cookie is effectively present
+        // Check if cookies are present
+        if (!$this->hasRememberMe()) {
+            // Clean the environment
+            $this->remove();
 
-        $entityId = $this->cookies->get('RMU')->getValue();
+            throw new UnexpectedValueException('Authable entity not found');
+        }
+
+        // Retrieve the remember me data
+
+        $cookieEntity = $this->cookies->get('RMU');
+        $entityId = $cookieEntity->getValue();
+
         $cookieToken = $this->cookies->get('RMT');
         $cookieTokenValue = $cookieToken->getValue();
+
+        // Retrieve the previously authenticated user and check if it correctly exists
 
         $entity = $this->retrieveAuthableById($entityId);
 
@@ -231,12 +244,9 @@ class Auth extends Component
             $token = md5($entity->getEmail() . $entity->getPassword() . $userAgent);
 
             if ($cookieTokenValue == $token) {
-
                 // Check if the cookie has not expired
-                // TODO Set Remember me time customizable in app config file
-                // TODO Check if Expiration check if correct
-                if (data('Y-m-d H:i:s',(time() - (86400 * 8))) < $cookieToken->getExpiration()) {
 
+                if (time() < $cookieToken->getExpiration()) {
                     // Check if the entity is banned
 
                     if ($entity->isBanned()) {
@@ -249,14 +259,14 @@ class Auth extends Component
                     return $entity;
                 }
 
-                throw new Exception('Remeber me token is expired');
+                throw new RememberMeTokenExpired('Remember me token is expired');
             }
         }
 
-        $this->cookies->get('RMU')->delete();
-        $this->cookies->get('RMT')->delete();
+        // Clean the environment since something went wrong
+        $this->remove();
 
-        throw new Exception('Authable entity not found');
+        throw new UnexpectedValueException('Authable entity not found');
     }
 
     /**
@@ -281,10 +291,12 @@ class Auth extends Component
     }
 
     /**
-     * Removes the user identity information from session.
+     * Removes the entity identity information from remember me cookies and session.
      */
-    public function remove()
+    protected function remove()
     {
+        // Destroy the remember me environment
+
         if ($this->cookies->has('RMU')) {
             $this->cookies->get('RMU')->delete();
         }
@@ -293,6 +305,15 @@ class Auth extends Component
             $this->cookies->get('RMT')->delete();
         }
 
+        // Logout the entity
+        $this->logout();
+    }
+
+    /**
+     * Logout the entity, i.e. removes the session data but keeps the remember me environment.
+     */
+    public function logout()
+    {
         $this->session->remove('auth');
     }
 

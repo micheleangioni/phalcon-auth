@@ -182,7 +182,7 @@ Now we can define a simple controller for User registration, login and logout
             $auth = $this->getDI()->get('auth');
             
             // Perform logout
-            $auth->remove();
+            $auth->logout();
     
             [...]
         }
