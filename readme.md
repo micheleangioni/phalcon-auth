@@ -115,7 +115,7 @@ This way, it will be easily retrievable for example in the controllers
         return \MicheleAngioni\PhalconAuthAuth(new \MyApp\Users());
     });
 
-Now we can define a simple controller for User registration and login
+Now we can define a simple controller for User registration, login and logout
 
     <?php
     
@@ -152,29 +152,40 @@ Now we can define a simple controller for User registration and login
         }
         
         public function loginAction()
-            {
-                $email = $this->request->getPost('email);
-                $password = $this->request->getPost('password);
-                
-                // [..] Data validation
+        {
+            $email = $this->request->getPost('email);
+            $password = $this->request->getPost('password);
             
-                // Retrieve Auth Service
-                $auth = $this->getDI()->get('auth');
-                
-                // Perform login
-                
-                try {
-                    $user = $auth->attemptLogin($email, $password);
-                } catch (\Exception $e) {
-                    if ($e instanceof \MicheleAngioni\PhalconAuth\Exceptions\UserBannedException) {
-                        // The user is banned. Handle exception
-                    } else {
-                        // Handle wrong credentials exception
-                    }
-                }
+            // [..] Data validation
         
-                [...]
+            // Retrieve Auth Service
+            $auth = $this->getDI()->get('auth');
+            
+            // Perform login
+            
+            try {
+                $user = $auth->attemptLogin($email, $password);
+            } catch (\Exception $e) {
+                if ($e instanceof \MicheleAngioni\PhalconAuth\Exceptions\UserBannedException) {
+                    // The user is banned. Handle exception
+                } else {
+                    // Handle wrong credentials exception
+                }
             }
+    
+            [...]
+        }
+        
+        public function logoutAction()
+        {
+            // Retrieve Auth Service
+            $auth = $this->getDI()->get('auth');
+            
+            // Perform logout
+            $auth->remove();
+    
+            [...]
+        }
     }
 
 After the login, the user id and email will be saved in the session. 

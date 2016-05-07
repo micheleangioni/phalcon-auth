@@ -266,6 +266,7 @@ class Auth extends Component
         if ($this->cookies->has('RMU')) {
             $this->cookies->get('RMU')->delete();
         }
+        
         if ($this->cookies->has('RMT')) {
             $this->cookies->get('RMT')->delete();
         }
