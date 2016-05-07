@@ -7,19 +7,42 @@ use MicheleAngioni\PhalconAuth\Contracts\RememberableAuthableInterface;
 use Phalcon\Mvc\User\Component;
 use Exception;
 use MicheleAngioni\PhalconAuth\Exceptions\EntityBannedException;
+use InvalidArgumentException;
 use RuntimeException;
 use UnexpectedValueException;
 
 class Auth extends Component
 {
     /**
+     * Duration in seconds of the remember me feature.
+     */
+    const REMEMBER_ME_DURATION = 604800; // 1w
+
+    /**
      * @var AuthableInterface
      */
     protected $authable;
 
-    public function __construct(AuthableInterface $authable)
+    /**
+     * Options array
+     *
+     * @var array
+     */
+    protected $options;
+
+    /**
+     * Auth constructor.
+     * Available options in $options array:
+     *  'rememberMeDuration' : int, duration of the remember me feature, in seconds
+     *
+     * @param  AuthableInterface  $authable
+     * @param  array  $options
+     */
+    public function __construct(AuthableInterface $authable, array $options = [])
     {
         $this->authable = $authable;
+
+        $this->options = $options;
     }
 
     /**
@@ -139,7 +162,7 @@ class Auth extends Component
      */
     public function registerUserThrottling($userId)
     {
-        // TODO Set up a user throttling with Redis
+        // TODO Set up a user throttling with Cache
 
         /*
         switch ($attempts) {
@@ -171,8 +194,7 @@ class Auth extends Component
         if (!$entity->setRememberToken($token)) {
             $entity->save();
 
-            // TODO Set Remember me time customizable in app config file
-            $expire = time() + 86400 * 8;
+            $expire = time() + $this->getRememberMeDuration(); // 1w;
             $this->cookies->set('RMU', $entity->getId(), $expire);
             $this->cookies->set('RMT', $token, $expire);
         }
@@ -349,5 +371,22 @@ class Auth extends Component
             'id' => $entity->getId(),
             'email' => $entity->getEmail()
         ]);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @return int
+     */
+    protected function getRememberMeDuration()
+    {
+        if (isset($this->options['rememberMeDuration'])) {
+            if (!is_int($this->options['rememberMeDuration'])) {
+                throw new InvalidArgumentException('The rememberMeDuration option must be a valid integer');
+            }
+
+            return $this->options['rememberMeDuration'];
+        }
+
+        return self::REMEMBER_ME_DURATION;
     }
 }
