@@ -192,13 +192,13 @@ class Auth extends Component
         $userAgent = $this->request->getUserAgent();
         $token = md5($entity->getEmail() . $entity->getPassword() . $userAgent);
 
-        if (!$entity->setRememberToken($token)) {
-            $entity->save();
+        $entity->setRememberToken($token);
+        $entity->save();
 
-            $expire = time() + $this->getRememberMeDuration();
-            $this->cookies->set('RMU', $entity->getId(), $expire);
-            $this->cookies->set('RMT', $token, $expire);
-        }
+        $expire = time() + $this->getRememberMeDuration();
+
+        $this->cookies->set('RMU', $entity->getId(), $expire);
+        $this->cookies->set('RMT', $token, $expire);
     }
 
     /**
@@ -224,7 +224,7 @@ class Auth extends Component
             // Clean the environment
             $this->remove();
 
-            throw new UnexpectedValueException('Authable entity not found');
+            throw new UnexpectedValueException('Remember me were not set.');
         }
 
         // Retrieve the remember me data

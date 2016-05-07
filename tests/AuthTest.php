@@ -90,6 +90,41 @@ class AuthWebTest extends TestCase
         $this->assertArrayHasKey('email', $auth);
     }
 
+    public function testAttemptLoginRememberMe()
+    {
+        $di = $this->getDI();
+        $security = $di->get('security');
+        $session = $di->get('session');
+
+        $user = static::$fm->create('MicheleAngioni\PhalconAuth\Tests\Users');
+        $user->password = $security->hash('password');
+        $user->save();
+
+        $users = new Users();
+
+        $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
+
+        // Inject the request and cookie objects into the auth Service, otherwise they won't won't be found
+        $auth->request = new \Phalcon\Http\Request();
+        $auth->cookies = new CookiesMock();
+
+        // Login with remember me
+        $auth->attemptLogin($user->email, 'password', true, true);
+
+        // Logout
+        $auth->logout();
+
+        // Login with remember me
+        $auth->loginWithRememberMe();
+
+        // Check if auth session data has been saved
+        $auth = $session->get('auth');
+
+        $this->assertTrue(is_array($auth));
+        $this->assertArrayHasKey('id', $auth);
+        $this->assertArrayHasKey('email', $auth);
+    }
+
     public function testRegister()
     {
         $di = $this->getDI();
@@ -236,5 +271,52 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
     public function getText()
     {
         return $this->text;
+    }
+}
+
+class CookiesMock
+{
+    public $keys = [];
+
+    public function has($key)
+    {
+        if (isset($this->keys[$key])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function get($key)
+    {
+        return $this->keys[$key];
+    }
+
+    public function set($key, $value, $expiration = null)
+    {
+        $this->keys[$key] = new CookieMock($value, $expiration);
+    }
+}
+
+class CookieMock
+{
+    public $value;
+
+    public $expiration;
+
+    public function __construct($value, $expiration)
+    {
+        $this->value = $value;
+        $this->expiration = $expiration;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function getExpiration()
+    {
+        return $this->expiration;
     }
 }
