@@ -166,7 +166,7 @@ Now we can define a simple controller for User registration, login and logout
             try {
                 $user = $auth->attemptLogin($email, $password);
             } catch (\Exception $e) {
-                if ($e instanceof \MicheleAngioni\PhalconAuth\Exceptions\UserBannedException) {
+                if ($e instanceof \MicheleAngioni\PhalconAuth\Exceptions\EntityBannedException) {
                     // The user is banned. Handle exception
                 } else {
                     // Handle wrong credentials exception

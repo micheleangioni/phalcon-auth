@@ -64,7 +64,7 @@ class AuthWebTest extends TestCase
     }
 
     /**
-     * @expectedException \MicheleAngioni\PhalconAuth\Exceptions\UserBannedException
+     * @expectedException \MicheleAngioni\PhalconAuth\Exceptions\EntityBannedException
      */
     public function testAttemptLoginFailingBanned()
     {

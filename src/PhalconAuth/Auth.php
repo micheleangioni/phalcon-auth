@@ -6,7 +6,7 @@ use MicheleAngioni\PhalconAuth\Contracts\AuthableInterface;
 use MicheleAngioni\PhalconAuth\Contracts\RememberableAuthableInterface;
 use Phalcon\Mvc\User\Component;
 use Exception;
-use MicheleAngioni\PhalconAuth\Exceptions\UserBannedException;
+use MicheleAngioni\PhalconAuth\Exceptions\EntityBannedException;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -114,7 +114,7 @@ class Auth extends Component
         // Check if the entity is banned
 
         if ($entity->isBanned()) {
-            throw new UserBannedException('The entity is banned');
+            throw new EntityBannedException('The entity is banned');
         }
 
         // If required, save the entity data into the session
@@ -218,7 +218,7 @@ class Auth extends Component
                     // Check if the entity is banned
 
                     if ($entity->isBanned()) {
-                        throw new UserBannedException('The entity is banned');
+                        throw new EntityBannedException('The entity is banned');
                     }
 
                     // Save the User data into the session
@@ -266,7 +266,7 @@ class Auth extends Component
         if ($this->cookies->has('RMU')) {
             $this->cookies->get('RMU')->delete();
         }
-        
+
         if ($this->cookies->has('RMT')) {
             $this->cookies->get('RMT')->delete();
         }
@@ -291,7 +291,7 @@ class Auth extends Component
         // Check if the entity is banned
 
         if ($entity->isBanned()) {
-            throw new UserBannedException('The entity is banned');
+            throw new EntityBannedException('The entity is banned');
         }
 
         // Save the User data into the session
