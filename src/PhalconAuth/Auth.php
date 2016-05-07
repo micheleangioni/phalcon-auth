@@ -52,6 +52,8 @@ class Auth extends Component
      *
      * @param  string  $email
      * @param  string  $password
+     * @param  array  $parameters
+     * @param  array  $uniqueParameters
      * @throws RuntimeException
      * @throws UnexpectedValueException
      *
@@ -111,11 +113,14 @@ class Auth extends Component
     }
 
     /**
-     * Attempt login of the authable entity credentials.
+     * Attempt login of the authable entity.
      *
-     * @param  array  $credentials
+     * @param  string  $email
+     * @param  string  $password
      * @param  bool  $saveSession
+     * @param  bool  $rememberMe
      * @throws Exception
+     * @throws EntityBannedException
      *
      * @return AuthableInterface
      */
@@ -159,9 +164,9 @@ class Auth extends Component
      * Implements login throttling
      * Reduces the effectiveness of brute force attacks (both on same user from different ips and on different users with same ip).
      *
-     * @param  int  $userId
+     * @param  int  $idEntity
      */
-    public function registerUserThrottling($userId)
+    public function registerUserThrottling($idEntity)
     {
         // TODO Set up a user throttling with Cache
 
@@ -214,7 +219,10 @@ class Auth extends Component
     /**
      * Log in using the information in the cookies.
      *
-     * @throws Exception
+     * @throws EntityBannedException
+     * @throws RememberMeTokenExpired
+     * @throws UnexpectedValueException
+     *
      * @return AuthableInterface
      */
     public function loginWithRememberMe()
@@ -322,6 +330,7 @@ class Auth extends Component
      *
      * @param  int  $id
      * @throws Exception
+     * @throws EntityBannedException
      */
     public function authById($id)
     {
@@ -345,7 +354,6 @@ class Auth extends Component
      * Retrieve and return the authable model by id.
      * Return null if the User is not found.
      *
-     * @throws Exception
      * @return AuthableInterface|null
      */
     public function retrieveAuthableById($id)
