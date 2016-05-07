@@ -8,6 +8,7 @@ use Phalcon\Mvc\User\Component;
 use Exception;
 use MicheleAngioni\PhalconAuth\Exceptions\EntityBannedException;
 use MicheleAngioni\PhalconAuth\Exceptions\RememberMeTokenExpired;
+use MicheleAngioni\PhalconAuth\Exceptions\WrongCredentialsException;
 use InvalidArgumentException;
 use RuntimeException;
 use UnexpectedValueException;
@@ -119,8 +120,8 @@ class Auth extends Component
      * @param  string  $password
      * @param  bool  $saveSession
      * @param  bool  $rememberMe
-     * @throws Exception
      * @throws EntityBannedException
+     * @throws WrongCredentialsException
      *
      * @return AuthableInterface
      */
@@ -131,13 +132,13 @@ class Auth extends Component
 
         if ($entity === false) {
             $this->registerUserThrottling(0);
-            throw new Exception('Wrong email/password combination');
+            throw new WrongCredentialsException('Wrong email/password combination');
         }
 
         // Check the password
         if (!$this->security->checkHash($password, $entity->password)) {
             $this->registerUserThrottling($entity->id);
-            throw new Exception('Wrong email/password combination');
+            throw new WrongCredentialsException('Wrong email/password combination');
         }
 
         // Check if the entity is banned
