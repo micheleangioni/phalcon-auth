@@ -1,5 +1,10 @@
 # Phalcon Auth
 
+[![License](https://poser.pugx.org/michele-angioni/phalcon-auth/license)](https://packagist.org/packages/michele-angioni/phalcon-auth)
+[![Latest Stable Version](https://poser.pugx.org/michele-angioni/phalcon-auth/v/stable)](https://packagist.org/packages/michele-angioni/phalcon-auth)
+[![Latest Unstable Version](https://poser.pugx.org/michele-angioni/phalcon-auth/v/unstable)](https://packagist.org/packages/michele-angioni/phalcon-auth)
+[![Build Status](https://travis-ci.org/micheleangioni/phalcon-auth.svg)](https://travis-ci.org/micheleangioni/phalcon-auth)
+
 ## Introduction
 
 Phalcon Auth provides you a fast way to register and authenticate your users. 
