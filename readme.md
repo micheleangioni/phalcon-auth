@@ -11,13 +11,15 @@ You are a Phalcon user, so speed and simplicity is what you are looking for.
 So, Phalcon Auth just requires your own User model to satisfy some requirements by implementing its interface. 
 Basically, it just need a few methods: 
 
-- getId() 
-- getEmail()
-- getPassword()
-- getConfirmationCode()
-- confirm()
-- isConfirmed()
-- isBanned()
+- getId() : (int)
+- getEmail() : (string)
+- getPassword() : (string)
+- setPassword($password) : (bool)
+- getConfirmationCode() : (string)
+- setConfirmationCode($confirmationCode) : (bool)
+- confirm() : (bool) 
+- isConfirmed() : (bool)
+- isBanned() : (bool)
 
 Furthermore, if you want to use the "remember me" feature, the following remember token getter and setter are required
  
@@ -119,7 +121,7 @@ This way, it will be easily retrievable for example in the controllers
         return \MicheleAngioni\PhalconAuthAuth(new \MyApp\Users());
     });
 
-Now we can define a simple controller for User registration, confirmation, login and logout
+Now we can define a simple controller for User registration, confirmation, login, logout and password reset:
 
     <?php
     
@@ -156,24 +158,24 @@ Now we can define a simple controller for User registration, confirmation, login
         }
         
         public function confirmAction($idUser, $confirmationCode)
-                {
-                    // Retrieve Auth Service
-                    $auth = $this->getDI()->get('auth');
-                    
-                    // Confirm the user
-                    
-                    try {
-                        $user = $auth->confirm($idUser, $confirmationCode);
-                    } catch (\Exception $e) {
-                        if ($e instanceof \EntityNotFoundException) {
-                            // User not found. Handle the exception
-                        } else {
-                            // Wrong confirmation code. Handle other exception
-                        }
-                    }
+        {
+            // Retrieve Auth Service
+            $auth = $this->getDI()->get('auth');
             
-                    [...]
+            // Confirm the user
+            
+            try {
+                $user = $auth->confirm($idUser, $confirmationCode);
+            } catch (\Exception $e) {
+                if ($e instanceof \EntityNotFoundException) {
+                    // User not found. Handle the exception
+                } else {
+                    // Wrong confirmation code. Handle other exception
                 }
+            }
+    
+            [...]
+        }
         
         public function loginAction()
         {
@@ -207,6 +209,50 @@ Now we can define a simple controller for User registration, confirmation, login
             
             // Perform logout
             $auth->logout();
+    
+            [...]
+        }
+        
+        public function getPasswordTokenAction($idUser)
+        {
+            // Retrieve Auth Service
+            $auth = $this->getDI()->get('auth');
+            
+            // Get the reset password token
+            
+            try {
+                $token = $auth->getResetPasswordToken($idUser);
+            } catch (\Exception $e) {
+                if ($e instanceof \MicheleAngioni\PhalconAuth\Exceptions\EntityNotFoundException) {
+                    // User not found. Handle the exception
+                } else {
+                    // Authable entity is not confirmed yet, it cannot reset the password. Handle the exception
+                }
+            }
+    
+            [...]
+        }
+        
+        public function resetPasswordAction($idUser, $resetToken)
+        {
+            $password = $this->request->getPost('newPassword);
+                        
+            // [..] Data validation
+        
+            // Retrieve Auth Service
+            $auth = $this->getDI()->get('auth');
+            
+            // Get the reset password token
+            
+            try {
+                $token = $auth->resetPassword($idUser, $resetToken, $newPassword);
+            } catch (\Exception $e) {
+                if ($e instanceof \MicheleAngioni\PhalconAuth\Exceptions\EntityNotFoundException) {
+                    // User not found. Handle the exception
+                } else {
+                    // Authable entity is not confirmed or the token is wrong. Handle the exception
+                }
+            }
     
             [...]
         }
@@ -254,7 +300,7 @@ When defining the Auth service, you can can pass an options array. Below all ava
          * Authentication
          */
          $options = [
-            'rememberMeDuration' => 1096000 // Optional, default: 604800 
+            'rememberMeDuration' => 1096000 // Optional, default: 604800 (1 week)
          ];
          
         $di->set('auth', function () {
