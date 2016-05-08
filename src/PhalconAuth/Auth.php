@@ -146,6 +146,66 @@ class Auth extends Component
     }
 
     /**
+     * Generate a reset password token, save it in the entity as confirmation code and then return it.
+     *
+     * @param  int  $idEntity
+     * @throws EntityNotFoundException
+     *
+     * @return bool
+     */
+    public function getResetPasswordToken($idEntity)
+    {
+        // Retrieve the entity
+
+        if (!$entity = $this->retrieveAuthableById($idEntity)) {
+            throw new EntityNotFoundException('Authable entity not found');
+        }
+
+        // Check that the entity is confirmed
+
+        if (!$entity->isConfirmed()) {
+            throw new UnexpectedValueException('Authable entity is not confirmed yet, it cannot reset the password.');
+        }
+
+        // Generate a reset token and save it
+        $token = $entity->setConfirmationCode(md5(uniqid(mt_rand(), true)));
+
+        return $token;
+    }
+
+    /**
+     * Reset the entity password.
+     * Return true on success.
+     *
+     * @param  int  $idEntity
+     * @param  string  $resetToken
+     * @param  string  $newPassword
+     * @throws EntityNotFoundException
+     * @throws UnexpectedValueException
+     *
+     * @return bool
+     */
+    public function resetPassword($idEntity, $resetToken, $newPassword)
+    {
+        // Retrieve the entity
+
+        if (!$entity = $this->retrieveAuthableById($idEntity)) {
+            throw new EntityNotFoundException('Authable entity not found');
+        }
+
+        // Check the token
+
+        if ($entity->getConfirmationCode() != $resetToken) {
+            throw new UnexpectedValueException('Reset token is wrong.');
+        }
+
+        // Reset the password
+        $entity->setPassword($this->security->hash($newPassword));
+
+        return true;
+    }
+
+    /**
      * Attempt login of the authable entity.
      *
      * @param  string  $email

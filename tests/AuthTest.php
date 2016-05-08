@@ -254,6 +254,7 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
     {
         $this->confirmed = true;
         $this->save();
+        return true;
     }
 
     public function isConfirmed()

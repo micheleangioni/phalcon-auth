@@ -26,6 +26,14 @@ interface AuthableInterface extends \Phalcon\Mvc\ModelInterface
     public function getPassword();
 
     /**
+     * Must set the model password and return true on success.
+     *
+     * @param  string  $password
+     * @return bool
+     */
+    public function setPassword($password);
+
+    /**
      * Must return the model confirmation code.
      *
      * @return string
@@ -33,9 +41,17 @@ interface AuthableInterface extends \Phalcon\Mvc\ModelInterface
     public function getConfirmationCode();
 
     /**
-     * Set the model as confirmed.
+     * Must set the model confirmation code and return true on success.
      *
-     * @return string
+     * @param  string  $confirmationCode
+     * @return bool
+     */
+    public function setConfirmationCode($confirmationCode);
+
+    /**
+     * Must set the model as confirmed and return true on success.
+     *
+     * @return bool
      */
     public function confirm();
 
