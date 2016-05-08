@@ -193,14 +193,22 @@ class Auth extends Component
             throw new EntityNotFoundException('Authable entity not found');
         }
 
+        // Check that the entity is confirmed
+
+        if (!$entity->isConfirmed()) {
+            throw new UnexpectedValueException('Authable entity is not confirmed yet, it cannot reset the password.');
+        }
+
         // Check the token
 
         if ($entity->getConfirmationCode() != $resetToken) {
             throw new UnexpectedValueException('Reset token is wrong.');
         }
 
-        // Reset the password
+        // Reset the password and change the confirmation code to invalid this token
         $entity->setPassword($this->security->hash($newPassword));
+        $entity->setConfirmationCode(md5(uniqid(mt_rand(), true)));
+        $entity->save();
 
         return true;
     }

@@ -33,7 +33,6 @@ class AuthWebTest extends TestCase
         $user->save();
 
         $users = new Users();
-
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
         $auth->attemptLogin($user->email, 'password');
 
@@ -58,7 +57,6 @@ class AuthWebTest extends TestCase
         $user->save();
 
         $users = new Users();
-
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
         $auth->attemptLogin($user->email, 'wrong_password');
     }
@@ -78,7 +76,6 @@ class AuthWebTest extends TestCase
         $user->save();
 
         $users = new Users();
-
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
         $auth->attemptLogin($user->email, 'password');
 
@@ -101,7 +98,6 @@ class AuthWebTest extends TestCase
         $user->save();
 
         $users = new Users();
-
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
 
         // Inject the request and cookie objects into the auth Service, otherwise they won't won't be found
@@ -135,7 +131,6 @@ class AuthWebTest extends TestCase
         $text = 'text';
 
         $users = new Users();
-
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
         $auth->register($email, $password, ['text' => $text]);
 
@@ -158,7 +153,6 @@ class AuthWebTest extends TestCase
         $password2 = 'password2';
 
         $users = new Users();
-
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
         $auth->register($email, $password);
         $auth->register($email, $password2);
@@ -174,7 +168,6 @@ class AuthWebTest extends TestCase
         $text = 'text';
 
         $users = new Users();
-
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
         $auth->register($email, $password, [], ['text' => $text]);
         $auth->register($email, $password, [], ['text' => $text]);
@@ -189,7 +182,6 @@ class AuthWebTest extends TestCase
         $this->assertEquals(false, $user->isConfirmed());
 
         $users = new Users();
-
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
         $auth->confirm($user->getId(), $user->getConfirmationCode());
 
@@ -210,9 +202,44 @@ class AuthWebTest extends TestCase
         $this->assertEquals(false, $user->isConfirmed());
 
         $users = new Users();
-
         $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
         $auth->confirm($user->getId(), 'wrong_confiration_code');
+    }
+
+    public function testResetPassword()
+    {
+        $di = $this->getDI();
+        $security = $di->get('security');
+
+        $user = static::$fm->create('MicheleAngioni\PhalconAuth\Tests\Users');
+        $user->confirmed = true;
+        $user->save();
+
+        $users = new Users();
+        $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
+
+        $token = $auth->getResetPasswordToken($user->getId());
+        $auth->resetPassword($user->getId(), $token, 'newPassword');
+
+        $user = $users->findFirst();
+
+        $this->assertTrue($security->checkHash('newPassword', $user->getPassword()));
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     */
+    public function testResetPasswordFailingWrongToken()
+    {
+        $user = static::$fm->create('MicheleAngioni\PhalconAuth\Tests\Users');
+        $user->confirmed = true;
+        $user->save();
+
+        $users = new Users();
+        $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
+
+        $auth->getResetPasswordToken($user->getId());
+        $auth->resetPassword($user->getId(), 'wrong_token', 'newPassword');
     }
 }
 
