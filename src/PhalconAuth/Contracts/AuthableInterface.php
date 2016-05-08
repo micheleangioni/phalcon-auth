@@ -33,6 +33,13 @@ interface AuthableInterface extends \Phalcon\Mvc\ModelInterface
     public function getConfirmationCode();
 
     /**
+     * Set the model as confirmed.
+     *
+     * @return string
+     */
+    public function confirm();
+
+    /**
      * Must check if the model is confirmed or not.
      *
      * @return bool

@@ -179,6 +179,41 @@ class AuthWebTest extends TestCase
         $auth->register($email, $password, [], ['text' => $text]);
         $auth->register($email, $password, [], ['text' => $text]);
     }
+
+    public function testConfirm()
+    {
+        $user = static::$fm->create('MicheleAngioni\PhalconAuth\Tests\Users');
+        $user->confirmed = false;
+        $user->save();
+
+        $this->assertEquals(false, $user->isConfirmed());
+
+        $users = new Users();
+
+        $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
+        $auth->confirm($user->getId(), $user->getConfirmationCode());
+
+        $user = $users->findFirst();
+
+        $this->assertEquals(true, $user->isConfirmed());
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     */
+    public function testConfirmFailingWrongCode()
+    {
+        $user = static::$fm->create('MicheleAngioni\PhalconAuth\Tests\Users');
+        $user->confirmed = false;
+        $user->save();
+
+        $this->assertEquals(false, $user->isConfirmed());
+
+        $users = new Users();
+
+        $auth = new \MicheleAngioni\PhalconAuth\Auth($users);
+        $auth->confirm($user->getId(), 'wrong_confiration_code');
+    }
 }
 
 class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Contracts\RememberableAuthableInterface
@@ -213,6 +248,12 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
     {
         $this->confirmation_code = $confirmationCode;
         return true;
+    }
+
+    public function confirm()
+    {
+        $this->confirmed = true;
+        $this->save();
     }
 
     public function isConfirmed()

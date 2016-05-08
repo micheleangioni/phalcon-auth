@@ -9,12 +9,13 @@ Phalcon Auth does not force you to use its own model nor create useless overhead
 You are a Phalcon user, so speed and simplicity is what you are looking for.
 
 So, Phalcon Auth just requires your own User model to satisfy some requirements by implementing its interface. 
-Basically, it just need a few property getters: 
+Basically, it just need a few methods: 
 
 - getId() 
 - getEmail()
 - getPassword()
 - getConfirmationCode()
+- confirm()
 - isConfirmed()
 - isBanned()
 
@@ -118,7 +119,7 @@ This way, it will be easily retrievable for example in the controllers
         return \MicheleAngioni\PhalconAuthAuth(new \MyApp\Users());
     });
 
-Now we can define a simple controller for User registration, login and logout
+Now we can define a simple controller for User registration, confirmation, login and logout
 
     <?php
     
@@ -151,8 +152,28 @@ Now we can define a simple controller for User registration, login and logout
                 }
             }
     
-            [...]
+            [...] // It is up to you to comunicate the confirmation code to the user
         }
+        
+        public function confirmAction($idUser, $confirmationCode)
+                {
+                    // Retrieve Auth Service
+                    $auth = $this->getDI()->get('auth');
+                    
+                    // Confirm the user
+                    
+                    try {
+                        $user = $auth->confirm($idUser, $confirmationCode);
+                    } catch (\Exception $e) {
+                        if ($e instanceof \EntityNotFoundException) {
+                            // User not found. Handle the exception
+                        } else {
+                            // Wrong confirmation code. Handle other exception
+                        }
+                    }
+            
+                    [...]
+                }
         
         public function loginAction()
         {
@@ -215,7 +236,7 @@ After authenticating with a "remember me", just use the following method
 
 ### Retrieve the logged user info from the session
 
-    $auth->getIdentity(); // Returns array with 'id' and 'email' keys
+    $auth->getIdentity(); // Returns an array with 'id' and 'email' keys
     
 ### Retrieve the authenticated user
 

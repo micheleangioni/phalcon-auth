@@ -56,6 +56,7 @@ class Auth extends Component
      * @param  string  $password
      * @param  array  $parameters
      * @param  array  $uniqueParameters
+     * @param  bool  $addConfirmationCode
      * @throws RuntimeException
      * @throws UnexpectedValueException
      *
@@ -112,6 +113,36 @@ class Auth extends Component
         }
 
         return $entity;
+    }
+
+    /**
+     * Confirm input entity.
+     * Return true on success.
+     *
+     * @param  int  $idEntity
+     * @param  string  $confirmationCode
+     * @throws EntityNotFoundException
+     *
+     * @return bool
+     */
+    public function confirm($idEntity, $confirmationCode)
+    {
+        // Retrieve the entity
+
+        if (!$entity = $this->retrieveAuthableById($idEntity)) {
+            throw new EntityNotFoundException('Authable entity not found');
+        }
+
+        // Check the confirmation code
+
+        if ($entity->getConfirmationCode() != $confirmationCode) {
+            throw new UnexpectedValueException('Confirmation code is wrong');
+        }
+
+        // Confirm the entity
+        $entity->confirm();
+
+        return true;
     }
 
     /**
