@@ -15,6 +15,7 @@ interface RememberableAuthableInterface extends AuthableInterface
      * Must set the model remember token and return true on success, false otherwise.
      *
      * @param  string
+     *
      * @return bool
      */
     public function setRememberToken($token);

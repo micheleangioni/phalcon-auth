@@ -38,8 +38,8 @@ class Auth extends Component
      * Available options in $options array:
      *  'rememberMeDuration' : int, duration of the remember me feature, in seconds
      *
-     * @param  AuthableInterface  $authable
-     * @param  array  $options
+     * @param  AuthableInterface $authable
+     * @param  array $options
      */
     public function __construct(AuthableInterface $authable, array $options = [])
     {
@@ -52,18 +52,24 @@ class Auth extends Component
      * Create a new User with email (must be unique) and password.
      * An $uniqueParameters array can be passed. A check will be made if those values have been already taken.
      *
-     * @param  string  $email
-     * @param  string  $password
-     * @param  array  $parameters
-     * @param  array  $uniqueParameters
-     * @param  bool  $addConfirmationCode
+     * @param  string $email
+     * @param  string $password
+     * @param  array $parameters
+     * @param  array $uniqueParameters
+     * @param  bool $addConfirmationCode
+     *
      * @throws RuntimeException
      * @throws UnexpectedValueException
      *
      * @return \Phalcon\Mvc\Model\ResultsetInterface
      */
-    public function register($email, $password, array $parameters = [], array $uniqueParameters = [], $addConfirmationCode = true)
-    {
+    public function register(
+        $email,
+        $password,
+        array $parameters = [],
+        array $uniqueParameters = [],
+        $addConfirmationCode = true
+    ) {
         // Check if the email is already taken
 
         if ($this->authable->findFirstByEmail($email)) {
@@ -72,7 +78,7 @@ class Auth extends Component
 
         // Check for unique parameters
 
-        foreach($uniqueParameters as $key => $value) {
+        foreach ($uniqueParameters as $key => $value) {
             $searchKey = 'findFirstBy' . ucfirst($key);
 
             if ($this->authable->$searchKey($value)) {
@@ -99,7 +105,7 @@ class Auth extends Component
         try {
             $entity->save($data);
         } catch (\Exception $e) {
-            throw new RuntimeException('Caught RuntimeException in '.__METHOD__.' at line '.__LINE__.': error creating new authable model.');
+            throw new RuntimeException('Caught RuntimeException in ' . __METHOD__ . ' at line ' . __LINE__ . ': error creating new authable model.');
         }
 
         if (count($entity->getMessages())) {
@@ -109,7 +115,7 @@ class Auth extends Component
                 $messages .= $message . ' ';
             }
 
-            throw new RuntimeException('Caught RuntimeException in '.__METHOD__.' at line '.__LINE__.': error creating new authable model: ' . $messages);
+            throw new RuntimeException('Caught RuntimeException in ' . __METHOD__ . ' at line ' . __LINE__ . ': error creating new authable model: ' . $messages);
         }
 
         return $entity;
@@ -119,8 +125,9 @@ class Auth extends Component
      * Confirm input entity.
      * Return true on success.
      *
-     * @param  int  $idEntity
-     * @param  string  $confirmationCode
+     * @param  int $idEntity
+     * @param  string $confirmationCode
+     *
      * @throws EntityNotFoundException
      *
      * @return bool
@@ -148,7 +155,8 @@ class Auth extends Component
     /**
      * Generate a reset password token, save it in the entity as confirmation code and then return it.
      *
-     * @param  int  $idEntity
+     * @param  int $idEntity
+     *
      * @throws EntityNotFoundException
      *
      * @return bool
@@ -177,9 +185,10 @@ class Auth extends Component
      * Reset the entity password.
      * Return true on success.
      *
-     * @param  int  $idEntity
-     * @param  string  $resetToken
-     * @param  string  $newPassword
+     * @param  int $idEntity
+     * @param  string $resetToken
+     * @param  string $newPassword
+     *
      * @throws EntityNotFoundException
      * @throws UnexpectedValueException
      *
@@ -216,10 +225,11 @@ class Auth extends Component
     /**
      * Attempt login of the authable entity.
      *
-     * @param  string  $email
-     * @param  string  $password
-     * @param  bool  $saveSession
-     * @param  bool  $rememberMe
+     * @param  string $email
+     * @param  string $password
+     * @param  bool $saveSession
+     * @param  bool $rememberMe
+     *
      * @throws EntityBannedException
      * @throws WrongCredentialsException
      *
@@ -265,7 +275,7 @@ class Auth extends Component
      * Implements login throttling
      * Reduces the effectiveness of brute force attacks (both on same user from different ips and on different users with same ip).
      *
-     * @param  int  $idEntity
+     * @param  int $idEntity
      */
     public function registerUserThrottling($idEntity)
     {
@@ -291,7 +301,7 @@ class Auth extends Component
     /**
      * Creates the remember me environment settings, i.e. the related cookies and generating the token.
      *
-     * @param  RememberableAuthableInterface  $entity
+     * @param  RememberableAuthableInterface $entity
      */
     public function createRememberEnvironment(RememberableAuthableInterface $entity)
     {
@@ -396,6 +406,7 @@ class Auth extends Component
     public function getEmail()
     {
         $identity = $this->session->get('auth');
+
         return $identity['email'];
     }
 
@@ -429,7 +440,8 @@ class Auth extends Component
     /**
      * Auth the authable model by id.
      *
-     * @param  int  $id
+     * @param  int $id
+     *
      * @throws EntityBannedException
      * @throws EntityNotFoundException
      */
@@ -493,7 +505,7 @@ class Auth extends Component
     /**
      * Save the User data into the Session.
      *
-     * @param  AuthableInterface  $entity
+     * @param  AuthableInterface $entity
      */
     protected function saveSessionData(AuthableInterface $entity)
     {
