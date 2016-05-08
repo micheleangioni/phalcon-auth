@@ -261,6 +261,11 @@ class Users extends \Phalcon\Mvc\Model implements \MicheleAngioni\PhalconAuth\Co
         return (bool)$this->confirmed;
     }
 
+    public function setConfirmed($confirmed)
+    {
+        $this->confirmed = $confirmed;
+    }
+
     public function getEmail()
     {
         return $this->email;
