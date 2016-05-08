@@ -28,10 +28,8 @@ Basically, it just need a few methods:
 
 Furthermore, if you want to use the "remember me" feature, the following remember token getter and setter are required
  
- - getRememberToken() 
- - setRememberToken($token)
-
-You can then use Phalcon Auth as provided out of the box or customize its behaviour. Just see below.
+ - getRememberToken()  : (string)
+ - setRememberToken($token) : (bool)
 
 ## Installation
  
