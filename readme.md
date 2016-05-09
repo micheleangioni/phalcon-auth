@@ -33,7 +33,7 @@ Furthermore, if you want to use the "remember me" feature, the following remembe
 
 ## Installation
  
-Support can be installed through Composer, just include `"michele-angioni/phalcon-auth": "~0.1"` to your composer.json and run `composer update` or `composer install`.
+Phalcon Auth can be installed through Composer, just include `"michele-angioni/phalcon-auth": "~0.1"` to your composer.json and run `composer update` or `composer install`.
 
 ## Usage
 
